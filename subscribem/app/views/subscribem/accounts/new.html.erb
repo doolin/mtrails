@@ -1,0 +1,21 @@
+<h2>Sign Up</h2>
+
+<%= form_for(@account) do |account| %>
+  <p>
+    <%= account.label :name %><br>
+    <%= account.text_field :name %><br>
+  </p>
+  <p>
+    <%= account.label :email %><br>
+    <%= account.text_field :email %><br>
+  </p>
+  <p>
+    <%= account.label :password %><br>
+    <%= account.text_field :password %><br>
+  </p>
+  <p>
+    <%= account.label :password_confirmation %><br>
+    <%= account.text_field :password_confirmation %><br>
+  </p>
+  <%= account.submit %>
+<% end %>
