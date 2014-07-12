@@ -3,7 +3,12 @@
 <%= form_for(@account) do |account| %>
   <p>
     <%= account.label :name %><br>
-    <%= account.text_field :name %><br>
+    <%= account.text_field :name %>
+  </p>
+
+  <p>
+    <%= account.label :subdomain %><br>
+    <%= account.text_field :subdomain %>
   </p>
 
   <%= account.fields_for :owner do |owner| %>
@@ -11,10 +16,12 @@
       <%= owner.label :email %><br>
       <%= owner.text_field :email %><br>
     </p>
+
     <p>
       <%= owner.label :password %><br>
       <%= owner.text_field :password %><br>
     </p>
+
     <p>
       <%= owner.label :password_confirmation %><br>
       <%= owner.text_field :password_confirmation %><br>
