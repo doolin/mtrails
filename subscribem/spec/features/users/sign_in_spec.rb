@@ -5,12 +5,12 @@ feature "User sign in" do
 
   let!(:account) { FactoryGirl.create :account }
   let(:sign_in_url) { "http://#{account.subdomain}.example.com/sign_in" }
-  let(:root_url) { "http://#{account.subdomain}.example.com" }
+  let(:root_url) { "http://#{account.subdomain}.example.com/" }
 
   within_account_subdomain do
     scenario "signs in as an account owner successfully" do
       visit root_url
-      expect(page.current_url).to eq(sign_in_url)
+      expect(page.current_url).to eq(root_url)
       fill_in "Email", with: account.owner.email
       fill_in "Password", with: "password"
       click_button "Sign in"
