@@ -4,7 +4,6 @@ ENV["RAILS_ENV"] ||= 'test'
 # We need to remove one level of nesting due to being an engine
 require File.expand_path("../dummy/config/environment", __FILE__)
 require 'rspec/rails'
-require 'rspec/autorun'
 require 'capybara/rspec'
 require 'factory_girl'
 
