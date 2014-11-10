@@ -47,7 +47,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   config.after(:each) do
-    Apartment::Database.reset
+    Apartment::Tenant.reset
 
     connection = ActiveRecord::Base.connection.raw_connection
     schemas = connection.query(%Q{

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature "User sign up" do
-  let!(:account) { FactoryGirl.create(:account_with_schemas) }
+  let!(:account) { FactoryGirl.create(:account_with_schema) }
   let(:root_url) { "http://#{account.subdomain}.example.com/" }
   scenario "under an account" do
     visit root_url
