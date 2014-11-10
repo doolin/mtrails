@@ -5,6 +5,7 @@ require File.expand_path("../dummy/config/environment", __FILE__)
 require 'rspec/rails'
 require 'capybara/rspec'
 require 'factory_girl'
+require 'database_cleaner'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -46,6 +47,34 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   config.after(:each) do
+    Apartment::Database.reset
+
+    connection = ActiveRecord::Base.connection.raw_connection
+    schemas = connection.query(%Q{
+      SELECT 'drop schema ' || nspname || ' cascade;'
+      from pg_namespace
+      where nspname != 'public'
+      AND nspname NOT LIKE 'pg_%'
+      AND nspname != 'information_schema';
+    })
+    schemas.each do |query|
+      connection.query(query.values.first)
+    end
+  end
+  config.before(:all) do
+    DatabaseCleaner.strategy = :truncation,
+      { :pre_count => true, :reset_ids => true }
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
     Apartment::Tenant.reset
+    #DatabaseCleaner.clean
   end
 end
+
+Capybara.app_host = "http://example.com"

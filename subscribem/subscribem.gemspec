@@ -28,4 +28,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "launchy"
   s.add_development_dependency "dynamic_form", "1.1.4"
   s.add_development_dependency "pry"
+  s.add_development_dependency "database_cleaner", '1.3.0'
 end
