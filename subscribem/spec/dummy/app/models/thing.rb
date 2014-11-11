@@ -1,3 +1,5 @@
 class Thing < ActiveRecord::Base
-  scoped_to_account
+  def scoped_to(account)
+    where(:account_id => account.id)
+  end
 end
