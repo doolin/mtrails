@@ -6,7 +6,7 @@ feature "User sign up" do
   let(:root_url) { "http://#{account.subdomain}.example.com/" }
   scenario "under an account" do
     visit root_url
-    expect(page.current_url).to eq(root_url + "sign_in" )
+    click_link "Sign in"
     click_link "New User?"
     fill_in "Email", :with => "user@example.com"
     fill_in "Password", :with => "password"
