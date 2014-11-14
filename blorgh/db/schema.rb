@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141112000046) do
+ActiveRecord::Schema.define(version: 20141114124453) do
 
   create_table "comments", force: true do |t|
     t.string   "username"
@@ -26,7 +26,10 @@ ActiveRecord::Schema.define(version: 20141112000046) do
     t.text     "text"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "account_id"
   end
+
+  add_index "posts", ["account_id"], name: "index_posts_on_account_id"
 
   create_table "subscribem_accounts", force: true do |t|
     t.string   "name"
