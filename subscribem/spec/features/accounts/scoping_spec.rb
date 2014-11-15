@@ -1,11 +1,13 @@
 require 'rails_helper'
+require "subscribem/testing_support/factories/account_factory"
+
 
 feature "Account scoping" do
   let!(:account_a) { FactoryGirl.create(:account) }
   let!(:account_b) { FactoryGirl.create(:account) }
   before do
-    Thing.create(:name => "Account A's Thing.")
-    Thing.create(:name => "Account B's Thing.")
+    Thing.scoped_to(account_a).create(:name => "Account A's Thing.")
+    Thing.scoped_to(account_b).create(:name => "Account B's Thing.")
   end
 
   scenario "displays only account A's records" do
