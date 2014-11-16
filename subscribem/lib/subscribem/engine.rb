@@ -2,6 +2,7 @@ require 'warden'
 require 'houser'
 require 'dynamic_form'
 require 'subscribem/active_record_extensions'
+require "braintree"
 
 module Subscribem
   class Engine < ::Rails::Engine

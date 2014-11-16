@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     subscribem (0.0.1)
+      braintree (= 2.35.0)
       houser (= 1.0.2)
       pg
       rails (= 4.1.1)
@@ -38,6 +39,8 @@ GEM
     addressable (2.3.6)
     arel (5.0.1.20140414130214)
     bcrypt (3.1.7)
+    braintree (2.35.0)
+      builder (>= 2.0.0)
     builder (3.2.2)
     capybara (2.3.0)
       mime-types (>= 1.16)
