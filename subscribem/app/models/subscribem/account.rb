@@ -18,6 +18,10 @@ module Subscribem
     validates_format_of :subdomain, :with => /\A[\w\-]+\Z/i,
       :message => "is not allowed. Please choose another subdomain."
 
+    def owner? user
+      owner == user
+    end
+
     def self.create_with_owner(params = {})
       account = new(params)
       if account.save

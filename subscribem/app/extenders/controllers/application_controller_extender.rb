@@ -4,6 +4,11 @@
   end
   helper_method :current_account
 
+  def owner?
+    current_account.owner?(current_user)
+  end
+  helper_method :owner?
+
   def current_user
     if user_signed_in?
       @current_user ||= begin
