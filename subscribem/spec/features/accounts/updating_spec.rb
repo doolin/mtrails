@@ -21,4 +21,16 @@ feature "Accounts" do
       expect(account.reload.name).to eq("A new name")
     end
   end
+
+  context "as a user" do
+    before do
+      user = FactoryGirl.create(:user)
+      sign_in_as(:user => user, :account => account)
+    end
+
+    scenario "cannot edit an account's information" do
+      visit subscribem.account_url(:subdomain => account.subdomain)
+      expect(page).to have_content("You are not allowed to do that.")
+    end
+  end
 end
