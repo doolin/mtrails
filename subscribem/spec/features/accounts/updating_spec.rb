@@ -20,6 +20,15 @@ feature "Accounts" do
       expect(page).to have_content("Account updated successfully.")
       expect(account.reload.name).to eq("A new name")
     end
+
+    scenario "updating an account with invalid attributes" do
+      visit root_url
+      click_link "Edit Account"
+      fill_in "Name", :with => ""
+      click_button "Update Account"
+      expect(page).to have_content("Name can't be blank")
+      expect(page).to have_content("Account could not be updated.")
+    end
   end
 
   context "as a user" do
