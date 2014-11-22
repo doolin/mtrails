@@ -1,6 +1,7 @@
 module Subscribem
   class Account < ActiveRecord::Base
     belongs_to :owner, :class_name => "Subscribem::User"
+    belongs_to :plan, :class_name => "Subscribem::Plan"
     has_many :members, :class_name => "Subscribem::Member"
     has_many :users, :through => :members
 
