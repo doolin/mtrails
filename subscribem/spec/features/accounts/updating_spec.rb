@@ -46,21 +46,45 @@ feature "Accounts" do
         )
       end
 
-      before do
-        account.update_column(:plan_id, starter_plan.id)
-      end
-
-      scenario "updating an account's plan" do
-        query_string = Rack::Utils.build_query(
+      let(:query_string1) do
+        Rack::Utils.build_query(
           :plan_id => extreme_plan.id,
           :http_status => 200,
           :id => "a_fake_id",
           :kind => "create_customer",
           :hash => "05738fa783d7fd49650c61251bf227053eea1eb2"
         )
+      end
+
+      let(:query_string2) do
+        Rack::Utils.build_query(
+          :plan_id => extreme_plan.id,
+          :http_status => 200,
+          :id => "a_fake_id",
+          :kind => "create_customer",
+          :hash => "3a5c5488ce9a7258490428a2921f21e58be7c187"
+        )
+      end
+
+      before do
+        account.update_column(:plan_id, starter_plan.id)
+      end
+
+      scenario "updating an account's plan" do
+        subscription_params = {
+          :payment_method_token => "abcdef",
+          :plan_id => extreme_plan.braintree_id
+        }
+
+        expect(Braintree::Subscription).to receive(:create).
+          with(subscription_params).
+          and_return(double(:success? => true))
         mock_transparent_redirect_response = double(:success? => true)
+        allow(mock_transparent_redirect_response).
+          to(receive_message_chain(:customer, :credit_cards).
+          and_return([double(:token => "abcdef")]))
         expect(Braintree::TransparentRedirect).to receive(:confirm).
-          with(query_string).
+          with(query_string1).
           and_return(mock_transparent_redirect_response)
         visit root_url
         click_link "Edit Account"
@@ -82,6 +106,33 @@ feature "Accounts" do
         click_button "Change plan"
         expect(page).to have_content("You have switched to the 'Extreme' plan.")
         expect(page.current_url).to eq(root_url)
+      end
+
+      scenario "can't change account's plan with invalid credit card number" do
+        message = "Credit card number must be 12-19 digits"
+        result = double(:success? => false, :message => message)
+        expect(Braintree::TransparentRedirect).to receive(:confirm).
+          with(query_string2).
+          and_return(result)
+        visit root_url
+        click_link "Edit Account"
+        select "Extreme", :from => 'Plan'
+        click_button "Update Account"
+        page.should have_content("Account updated successfully.")
+        plan_url = subscribem.plan_account_url(
+          :plan_id => extreme_plan.id,
+          :subdomain => account.subdomain)
+        page.current_url.should == plan_url
+        page.should have_content("You are changing to the 'Extreme' plan.")
+        page.should have_content("This plan costs $19.95 per month.")
+        fill_in "Credit card number", :with => "1"
+        fill_in "Name on card", :with => "Dummy test"
+        future_date = "#{Time.now.month + 1}/#{Time.now.year + 1}"
+        fill_in "Expiration date", :with => future_date
+        fill_in "CVV", :with => "123"
+        click_button "Change plan"
+        page.should have_content("Invalid credit card details. Please try again.")
+        page.should have_content("Credit card number must be 12-19 digits")
       end
     end
   end
