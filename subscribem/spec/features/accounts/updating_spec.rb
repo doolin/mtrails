@@ -76,9 +76,13 @@ feature "Accounts" do
           :plan_id => extreme_plan.braintree_id
         }
 
+        subscription_result = double(:success? => true,
+                                     :subscription => double(:id => "abc123"))
+
         expect(Braintree::Subscription).to receive(:create).
           with(subscription_params).
-          and_return(double(:success? => true))
+          and_return(subscription_result)
+
         mock_transparent_redirect_response = double(:success? => true)
         allow(mock_transparent_redirect_response).
           to(receive_message_chain(:customer, :credit_cards).
@@ -86,6 +90,7 @@ feature "Accounts" do
         expect(Braintree::TransparentRedirect).to receive(:confirm).
           with(query_string1).
           and_return(mock_transparent_redirect_response)
+
         visit root_url
         click_link "Edit Account"
         select "Extreme", :from => 'Plan'
@@ -118,21 +123,38 @@ feature "Accounts" do
         click_link "Edit Account"
         select "Extreme", :from => 'Plan'
         click_button "Update Account"
-        page.should have_content("Account updated successfully.")
+        expect(page).to have_content("Account updated successfully.")
         plan_url = subscribem.plan_account_url(
           :plan_id => extreme_plan.id,
           :subdomain => account.subdomain)
-        page.current_url.should == plan_url
-        page.should have_content("You are changing to the 'Extreme' plan.")
-        page.should have_content("This plan costs $19.95 per month.")
+        expect(page.current_url).to eq(plan_url)
+        expect(page).to have_content("You are changing to the 'Extreme' plan.")
+        expect(page).to have_content("This plan costs $19.95 per month.")
         fill_in "Credit card number", :with => "1"
         fill_in "Name on card", :with => "Dummy test"
         future_date = "#{Time.now.month + 1}/#{Time.now.year + 1}"
         fill_in "Expiration date", :with => future_date
         fill_in "CVV", :with => "123"
         click_button "Change plan"
-        page.should have_content("Invalid credit card details. Please try again.")
-        page.should have_content("Credit card number must be 12-19 digits")
+        expect(page).to have_content("Invalid credit card details. Please try again.")
+        expect(page).to have_content("Credit card number must be 12-19 digits")
+      end
+
+      scenario "changing plan after initial subscription" do
+        expect(Braintree::Subscription).to receive(:update).
+          with("abc123", { :plan_id => extreme_plan.braintree_id }).
+          and_return(double(:success? => true))
+        account.update_column(:braintree_subscription_id, "abc123")
+        visit root_url
+        click_link "Edit Account"
+        select "Extreme", :from => 'Plan'
+        click_button "Update Account"
+        expect(page).to have_content("You are changing to the 'Extreme' plan.")
+        expect(page).to have_content("This plan costs $19.95 per month.")
+        click_button "Change plan"
+        expect(page).to have_content("You have switched to the 'Extreme' plan.")
+        expect(page.current_url).to eq(root_url)
+        expect(account.reload.plan).to eq(extreme_plan)
       end
     end
   end
